@@ -1,0 +1,86 @@
+Sure! Let's go through the steps to create a logical volume using LVM with the new disks `/dev/sdb`, `/dev/sdc`, and `/dev/sdd`, each being 8 GB. We'll create a logical volume that is 20 GB in size.
+
+### Steps to Create a Logical Volume Using LVM
+
+1. **Install LVM Tools**:
+   - Ensure that the LVM tools are installed on your system:
+     ```bash
+     sudo yum install lvm2  # For RHEL-based systems
+     sudo apt-get install lvm2  # For Debian-based systems
+     ```
+
+2. **Initialize Physical Volumes**:
+   - Initialize the new disks as physical volumes:
+     ```bash
+     sudo pvcreate /dev/sdb /dev/sdc /dev/sdd
+     ```
+
+3. **Create a Volume Group**:
+   - Create a volume group named `vg0` using the initialized physical volumes:
+     ```bash
+     sudo vgcreate vg0 /dev/sdb /dev/sdc /dev/sdd
+     ```
+
+4. **Create a Logical Volume**:
+   - Create a logical volume named `lv0` with a size of 20 GB within the volume group `vg0`:
+     ```bash
+     sudo lvcreate -L 20G -n lv0 vg0
+     ```
+
+5. **Create a Filesystem on the Logical Volume**:
+   - Create an ext4 filesystem on the new logical volume:
+     ```bash
+     sudo mkfs.ext4 /dev/vg0/lv0
+     ```
+
+6. **Mount the Logical Volume**:
+   - Create a mount point and mount the logical volume:
+     ```bash
+     sudo mkdir /mnt/lv0
+     sudo mount /dev/vg0/lv0 /mnt/lv0
+     ```
+
+7. **Verify the Setup**:
+   - Verify that the logical volume is mounted correctly:
+     ```bash
+     df -h /mnt/lv0
+     ```
+
+8. **Persist the Mount Across Reboots**:
+   - Add an entry to `/etc/fstab` to ensure the logical volume is mounted at boot:
+     ```bash
+     echo '/dev/vg0/lv0 /mnt/lv0 ext4 defaults 0 0' | sudo tee -a /etc/fstab
+     ```
+
+### Summary of Commands
+
+Here is a summary of the commands you will use:
+
+```bash
+# Install LVM tools
+sudo yum install lvm2  # or sudo apt-get install lvm2
+
+# Initialize physical volumes
+sudo pvcreate /dev/sdb /dev/sdc /dev/sdd
+
+# Create a volume group
+sudo vgcreate vg0 /dev/sdb /dev/sdc /dev/sdd
+
+# Create a logical volume
+sudo lvcreate -L 20G -n lv0 vg0
+
+# Create a filesystem on the logical volume
+sudo mkfs.ext4 /dev/vg0/lv0
+
+# Mount the logical volume
+sudo mkdir /mnt/lv0
+sudo mount /dev/vg0/lv0 /mnt/lv0
+
+# Verify the setup
+df -h /mnt/lv0
+
+# Persist the mount across reboots
+echo '/dev/vg0/lv0 /mnt/lv0 ext4 defaults 0 0' | sudo tee -a /etc/fstab
+```
+
+By following these steps, you will have successfully created a 20 GB logical volume using LVM and mounted it on your system. Let me know if you need further assistance with any of these steps!
